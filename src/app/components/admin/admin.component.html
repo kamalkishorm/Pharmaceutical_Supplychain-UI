@@ -15,7 +15,7 @@
         <section class="admin-body">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="alert alert-info" id="divOngoingTransaction" style="display: none">Ongoing Transaction:
+                    <div class="alert alert-info" id="divOngoingTransaction" style="display: none">Recent Transaction:
                         <span id="linkOngoingTransaction">None</span> </div>
                 </div>
             </div>
@@ -70,7 +70,12 @@
 
                         <div class="row" style="padding: 0px 0px 10px 0px">
                             <div class="col-md-6">
-                                <h3 class="box-title ">Users</h3>
+                                <h3 class="box-title ">Users &nbsp;
+                                    <button type="button" class="btn btn-default btn-sm" (click)="refreshList()">
+                                        <img src="https://img.icons8.com/material/24/000000/update-left-rotation.png">
+                                    </button>
+                                </h3>
+
                             </div>
                             <div class="col-md-6" style="text-align: right;">
                                 <button mat-raised-button data-toggle="modal" data-target="#createuser1">Create User</button>
@@ -170,7 +175,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss = "modal" (click)="userRegister()"
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="userRegister()"
                         [disabled]="!registerUser.valid">Save Changes</button>
                 </div>
             </div>

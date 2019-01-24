@@ -43,7 +43,7 @@ export class AdminComponent implements OnInit {
     { role: "Distributer", value: 5 },
     { role: "Pharma", value: 6 }
   ];
-  user_list: UserTable[];
+  user_list = [];//:UserTable[];
   displayedColumns: string[] = ['ethaddress', 'location', 'name', 'role'];
 
   dataSource: MatTableDataSource<UserTable>;
@@ -86,14 +86,24 @@ export class AdminComponent implements OnInit {
   getUserInfo = async () => {
     let that = this;
     console.log(that.userCount)
-    that.user_list = [];
+    // that.user_list = [];
+    let itrate = true;
+    let from = Number(localStorage.getItem('useridpointer'));
+    let to: Number;
+    if (that.userCount < from + 5) {
+      to = that.userCount;
+      localStorage.setItem('useridpointer', to + '');
+      itrate = false;
+    } else if (that.userCount > from + 5) {
+      to = from + 5;
+      localStorage.setItem('useridpointer', to + '');
+    }
     let i: number;
-    for (i = Number(localStorage.getItem('useridpointer')); i < that.userCount; i++) {
+    for (i = from; i < to; i++) {
       await this.ethcontractService.getUserProfile(i).then(function (userInfoList: any) {
         if (userInfoList) {
           userInfoList.result.Role = that.Roles[userInfoList.result.Role].role;
           that.user_list.push(userInfoList.result);
-          console.log(userInfoList.result.Role);
         }
       }).catch(function (error) {
         console.log(error);
@@ -103,6 +113,23 @@ export class AdminComponent implements OnInit {
     console.log(that.user_list);
     this.dataSource = new MatTableDataSource<UserTable>(that.user_list);
     this.dataSource.paginator = this.paginator;
+    if (itrate) {
+      that.getUserInfo();
+    }
+  }
+
+  refreshList = () => {
+    let that = this;
+    this.ethcontractService.getUserCount().then(function (count: any) {
+      if (count) {
+        that.userCount = count.UserCount;
+        console.log(Number(localStorage.getItem('useridpointer')));
+        if (Number(localStorage.getItem('useridpointer')) <= that.userCount) {
+          that.getUserInfo();
+        }
+      }
+    });
+
   }
 
   userRegister = async () => {
@@ -116,7 +143,7 @@ export class AdminComponent implements OnInit {
     }
     console.log(formdata);
     let that = this;
-    this.ethcontractService.getCount(formdata).then(function (txhash: any) {
+    this.ethcontractService.registerNewUser(formdata).then(function (txhash: any) {
       if (txhash) {
         console.log(txhash);
         that.handleTransactionResponse(txhash);
@@ -124,27 +151,13 @@ export class AdminComponent implements OnInit {
     }).catch(function (error) {
       console.log(error);
     });
-
-
-    // await this.ethcontractService.registerNewUser(formdata).then(function (txhash: any) {
-    //   if(txhash){
-    //     console.log(txhash);
-    //   }
-    // }).catch(function(error){
-    //   console.log(error);
-    // })
   }
-
-  // testcount = () => {
-  //   var tx = this.ethcontractService.getCount();
-  // }
 
   handleTransactionResponse = (txHash) => {
     var txLink = "https://ropsten.etherscan.io/tx/" + txHash;
     var txLinkHref = "<a target='_blank' href='" + txLink + "'> Click here for Transaction Status </a>";
 
-    // Swal.fire("Success", "Please Check Transaction Status here :  " + txLinkHref, "success");
-
+    Swal.fire("Success", "Please Check Transaction Status here :  " + txLinkHref, "success");
     $("#linkOngoingTransaction").html(txLinkHref);
     $("#divOngoingTransaction").fadeIn();
     /*scroll to top*/

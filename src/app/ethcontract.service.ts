@@ -9,11 +9,15 @@ let contract = require('./shared/Contracts/supplychain.json');
   providedIn: 'root'
 })
 export class EthcontractService {
+
+  /************************************************* Variables *************************************/
   private web3: any;
   private web3Provider: null;
   private contracts: any;
   private contractAddress: "0x0000000000000000000000000000000000000000";
-  private coinbase: any;
+  private coinbase: "0x0000000000000000000000000000000000000000";
+
+  /************************************************* Constructor ***********************************/
   constructor() {
     if (typeof window.web3 !== 'undefined') {
       this.web3Provider = window.web3.currentProvider;
@@ -31,6 +35,7 @@ export class EthcontractService {
     console.log(this.contracts);
   }
 
+  /************************************************* Basic *****************************************/
   getcoinbase() {
     let that = this;
     that.web3.eth.getCoinbase(function (err, account) {
@@ -57,51 +62,7 @@ export class EthcontractService {
     });
   }
 
-  getRole() {
-    let that = this;
-    return new Promise((resolve, reject) => {
-      that.web3.eth.getCoinbase(function (err, account) {
-        if (err === null) {
-          that.web3.eth.getBalance(account, function (err, balance) {
-            if (err === null) {
-              let SupplyChainContract = TruffleContract(contract);
-              SupplyChainContract.setProvider(that.web3Provider);
-              SupplyChainContract.deployed().then(function (instance) {
-                // console.log(instance);
-                that.contractAddress = instance.address;
-                return instance.getUserInfo(
-                  account,
-                  {
-                    from: account
-                  });
-              }).then(function (res) {
-                if (res) {
-                  // console.log(res[0].substring(0,34))
-                  var jsonres = {
-                    "Name": that.web3.toAscii(res[0].replace(/0+\b/, "")),
-                    "Location": that.web3.toAscii(res[1].replace(/0+\b/, "")),
-                    "EthAddress": res[2],
-                    "Role": JSON.parse(res[3])
-                  }
-                  window.jsonres = jsonres;
-
-                  return resolve({ Account: account, Balance: that.web3.fromWei(balance, "ether"), Role: jsonres, contractAddress: that.contractAddress });
-                }
-              }).catch(function (error) {
-                console.log(error);
-                return reject("Error in transferEther service call");
-              });
-            } else {
-              return reject("error!");
-            }
-          });
-        } else {
-          return reject("No Coinbase!");
-        }
-      });
-    });
-  }
-
+  /************************************************* Admin *****************************************/
   getOwner() {
     let that = this;
     return new Promise((resolve, reject) => {
@@ -109,32 +70,24 @@ export class EthcontractService {
         if (err === null) {
           that.web3.eth.getBalance(account, function (err, balance) {
             if (err === null) {
-              let SupplyChainContract = TruffleContract(contract);
-              SupplyChainContract.setProvider(that.web3Provider);
-              SupplyChainContract.deployed().then(function (instance) {
-                // console.log(instance.address);
-                that.contractAddress = instance.address;
-                return instance.Owner();
-              }).then(function (res) {
-                if (res) {
-                  if (res == account) {
-                    SupplyChainContract.deployed().then(function (instance) {
-                      return instance.getUsersCount();
-                    }).then(function (count) {
-                      if (count) {
-                        return resolve({ Account: account, Balance: that.web3.fromWei(balance, "ether"), Role: 'Success', contractAddress: that.contractAddress, UserCount: count });
-                      } else {
-                        return resolve({ Account: account, Balance: that.web3.fromWei(balance, "ether"), Role: 'Success', contractAddress: that.contractAddress, UserCount: "Error" });
+              that.contracts.Owner(function (error, ownerAddress) {
+                if (!error) {
+                  if (ownerAddress == account) {
+                    that.contracts.getUsersCount(function (error, userCount) {
+                      if (!error) {
+                        return resolve({ Account: account, Balance: that.web3.fromWei(balance, "ether"), Role: 'Success', contractAddress: that.contractAddress, UserCount: JSON.parse(userCount) });
                       }
-                    });
-                  } else {
+                      else
+                        return resolve({ Account: account, Balance: that.web3.fromWei(balance, "ether"), Role: 'Success', contractAddress: that.contractAddress, UserCount: "Error" });
+                    })
+                  }
+                  else {
                     return resolve({ Role: 'Failure' });
                   }
                 }
-              }).catch(function (error) {
-                console.log(error);
-                return reject("Error in transferEther service call");
-              });
+                else
+                  reject(error);
+              })
             } else {
               return reject("error!");
             }
@@ -146,141 +99,99 @@ export class EthcontractService {
     });
   }
 
+  registerNewUser = (formdata) => {
+    let that = this;
+    formdata.Name = that.web3.padRight(that.web3.fromAscii(formdata.Name), 34);
+    formdata.Location = that.web3.padRight(that.web3.fromAscii(formdata.Location), 34);
 
+    return new Promise((resolve, reject) => {
+      // that.web3.eth.getCoinbase(function (err, account) {
+      that.contracts.registerUser(formdata.EthAddress, formdata.Name, formdata.Location, formdata.Role, {
+        from: that.coinbase
+      }, function (error, result) {
+        if (!error)
+          resolve(result)
+        else
+          reject(error);
+      })
+    });
+    // });
+  }
 
-  // getUserInfo(from: number, to: number) {
-  //   let that = this;
-  //   return new Promise((resolve, reject) => {
-  //     let response = [];
-  //     let SupplyChainContract = TruffleContract(contract);
-  //     SupplyChainContract.setProvider(that.web3Provider);
-  //     let i: number;
-  //     let flag = false;
-  //     for (i = from; i < to;) {
-  //       if (!flag) {
-  //         continue;
-  //       }
-  //       flag = true;
-  //       SupplyChainContract.deployed().then(function (instance) {
-  //         console.log(i);
-  //         return instance.getUserbyIndex(Number(i));
-  //       }).then(function (uinfo) {
-  //         if (uinfo) {
-  //           console.log(uinfo);
-  //           response.push(uinfo);
-  //           flag = false;
-  //           i++;
-  //         }
-  //         if (i == to) {
-  //           return resolve({ result: response });
-  //         }
-  //       }).catch(function (error) {
-  //         console.log(error);
-  //         return reject("Error in transferEther service call");
-  //       });
-  //     }
+  /************************************************* Users *****************************************/
+  getRole() {
+    let that = this;
+    return new Promise((resolve, reject) => {
+      that.web3.eth.getCoinbase(function (err, account) {
+        if (err === null) {
+          that.web3.eth.getBalance(account, function (err, balance) {
+            if (err === null) {
+              that.contracts.getUserInfo(
+                account,
+                {
+                  from: account
+                }, function (error, res) {
+                  if (res) {
+                    // console.log(res[0].substring(0,34))
+                    var jsonres = {
+                      "Name": that.web3.toAscii(res[0].replace(/0+\b/, "")),
+                      "Location": that.web3.toAscii(res[1].replace(/0+\b/, "")),
+                      "EthAddress": res[2],
+                      "Role": JSON.parse(res[3])
+                    }
+                    return resolve({ Account: account, Balance: that.web3.fromWei(balance, "ether"), Role: jsonres, contractAddress: that.contractAddress });
+                  }
+                }).catch(function (error) {
+                  console.log(error);
+                  return reject("Error in transferEther service call");
+                });
+            } else {
+              return reject("error!");
+            }
+          });
+        } else {
+          return reject("No Coinbase!");
+        }
+      });
+    });
+  }
 
-  //   });
-  // }
+  getUserCount() {
+    let that = this;
+    return new Promise((resolve, reject) => {
+      that.contracts.getUsersCount(function (error, userCount) {
+        if (!error) {
+          return resolve({ UserCount: JSON.parse(userCount) });
+        }
+        else
+          return reject(error);
+      });
+    });
+  }
 
   getUserProfile(index: Number) {
     let that = this;
     return new Promise((resolve, reject) => {
-      let SupplyChainContract = TruffleContract(contract);
-      SupplyChainContract.setProvider(that.web3Provider);
-      SupplyChainContract.deployed().then(function (instance) {
-        console.log(index);
-        return instance.getUserbyIndex(index);
-      }).then(function (uinfo) {
-        if (uinfo) {
+      that.contracts.getUserbyIndex(index, {
+        from: that.coinbase
+      }, function (error, uinfo) {
+        if (!error) {
           var jsonres = {
             "Name": that.web3.toAscii(uinfo[0].replace(/0+\b/, "")),
             "Location": that.web3.toAscii(uinfo[1].replace(/0+\b/, "")),
             "EthAddress": uinfo[2],
             "Role": JSON.parse(uinfo[3])
           }
-          return resolve({ result: jsonres });
+          console.log(jsonres);
+          resolve({ result: jsonres });
         }
-      }).catch(function (error) {
-        console.log(error);
-        return reject("Error in transferEther service call");
-      });
+        else
+          reject(error);
+      })
     });
   }
 
-  registerNewUser(formdata) {
-    let that = this;
-    formdata.Name = that.web3.padRight(that.web3.fromAscii(formdata.Name), 34);
-    formdata.Location = that.web3.padRight(that.web3.fromAscii(formdata.Location), 34);
-    return new Promise((resolve, reject) => {
+  /************************************************* Supplier *************************************/
 
-      that.web3.eth.getCoinbase(function (err, account) {
-        if (err === null) {
-          let SupplyChainContract = TruffleContract(contract);
-          SupplyChainContract.setProvider(that.web3Provider);
-          SupplyChainContract.deployed().then(function (instance) {
-            console.log(formdata);
-            // var tq = instance.registerUser(formdata.EthAddress, formdata.Name, formdata.Location, formdata.Role, {
-            //   from: account
-            // })
-            // return that.waitForHash(tq);
-            return instance.registerUser(formdata.EthAddress, formdata.Name, formdata.Location, formdata.Role, {
-              from: account
-            }).on('transactionHash', function (hash) {
-              resolve(hash);
-            });
-          }).then(function (result) {
-            if (result) {
-              return resolve({ result: result });
-            } else {
-              return reject("Error in tx");
-            }
-          }).catch(function (error) {
-            console.log(error);
-            return reject("Error in transactiion call");
-          });
-          // .on('transactionHash', hash => resolve(hash)).catch(function (error) {
-          //   console.log(error);
-          //   return reject("Error in transactiion call");
-          // });
-          // });
-        }
-      });
-    });
-  }
 
-  getCount = (formdata) => {
-    let that = this;
-    formdata.Name = that.web3.padRight(that.web3.fromAscii(formdata.Name), 34);
-    formdata.Location = that.web3.padRight(that.web3.fromAscii(formdata.Location), 34);
-
-    return new Promise((resolve, reject) => {
-      that.web3.eth.getCoinbase(function (err, account) {
-
-        that.contracts.registerUser(formdata.EthAddress, formdata.Name, formdata.Location, formdata.Role, {
-          from: that.coinbase
-        }, function (error, result) {
-          if (!error)
-            resolve(result)
-          else
-            reject(error);
-        })
-      });
-    });
-    // that.web3.eth.sendTransaction(
-    //   {
-    //     to: "0xa6c51e1059232fE0F4152138B288B401491617a7",
-    //     from: account,
-    //     value: 10000
-    //   }, function (error, result) {
-    //     if (!error)
-    //       console.log(JSON.stringify(result));
-    //     else
-    //       console.error(error);
-    //   }).on('transactionHash', function (hash) {
-    //     resolve(hash);
-    //   })
-    //   .on('error', reject);
-    // .on('transactionHash', hash => resolve(hash)).catch(reject);
-  }
 }
