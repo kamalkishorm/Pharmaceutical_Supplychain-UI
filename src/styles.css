@@ -1,0 +1,14 @@
+/* You can add global styles to this file; and also import other style files */
+@import '~bootstrap/dist/css/bootstrap.css';  
+/* @import '~@angular/material/prebuilt-themes/indigo-pink.css'; */
+@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+@import 'https://fonts.googleapis.com/icon?family=Material+Icons';
+
+#wrapper {
+    width: 100%;
+    margin: 0 auto;
+    box-shadow: 1px 0 50px rgba(0,0,0,.2);
+}
+body {
+    background-color: whitesmoke
+}

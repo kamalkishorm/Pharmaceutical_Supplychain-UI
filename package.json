@@ -1,0 +1,77 @@
+{
+  "name": "pharmaceutical_supplychain-ui",
+  "version": "1.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "test": "ng test",
+    "lint": "ng lint",
+    "e2e": "ng e2e"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "^7.2.2",
+    "@angular/cdk": "^7.2.2",
+    "@angular/common": "~7.2.2",
+    "@angular/compiler": "~7.2.2",
+    "@angular/core": "~7.2.2",
+    "@angular/forms": "~7.2.2",
+    "@angular/material": "^7.2.2",
+    "@angular/platform-browser": "~7.2.2",
+    "@angular/platform-browser-dynamic": "~7.2.2",
+    "@angular/router": "~7.2.2",
+    "@ng-bootstrap/ng-bootstrap": "^4.0.1",
+    "@types/chart.js": "^2.7.42",
+    "bootstrap": "latest",
+    "fs-extra": "^7.0",
+    "jquery": "3.3.1",
+    "popper.js": "^1.14.6",
+    "sweetalert": "^2.1.2",
+    "sweetalert2": "^8.0.1",
+    "tar": "latest",
+    "truffle-contract": "3.0.6",
+    "web3": "0.20.5",
+    "zone.js": "~0.8.29"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "~0.12.2",
+    "@angular/cli": "~7.2.2",
+    "@angular/compiler-cli": "~7.2.2",
+    "@angular/language-service": "~7.2.2",
+    "@types/node": "~10.12.18",
+    "@types/jasmine": "~3.3.7",
+    "@types/jasminewd2": "~2.0.6",
+    "codelyzer": "~4.5.0",
+    "jasmine-core": "~3.3.0",
+    "jasmine-spec-reporter": "~4.2.1",
+    "karma": "~3.1.4",
+    "karma-chrome-launcher": "~2.2.0",
+    "karma-coverage-istanbul-reporter": "~2.0.4",
+    "karma-jasmine": "~2.0.1",
+    "karma-jasmine-html-reporter": "^1.4.0",
+    "protractor": "~5.4.2",
+    "ts-node": "~8.0.1",
+    "tslint": "~5.12.1",
+    "typescript": "~3.2.4"
+  },
+  "description": "This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.2.2.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kamalkishorm/Pharmaceutical_Supplychain-UI.git"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "angular7",
+    "solidity",
+    "pharma"
+  ],
+  "author": "Kamal Kishor Mehra",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kamalkishorm/Pharmaceutical_Supplychain-UI/issues"
+  },
+  "homepage": "https://github.com/kamalkishorm/Pharmaceutical_Supplychain-UI#readme"
+}

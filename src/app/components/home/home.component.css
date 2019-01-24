@@ -1,0 +1,35 @@
+.background {
+    width: 100%;
+    height: 100vh;
+    background: url('../../../assets/img/background_01.jpg') no-repeat;
+    background-size: cover;
+    color: black;
+    text-align: center;
+    overflow: hidden;
+}
+
+.login-box {
+    background: #fff;
+    width: 400px;
+    margin: 10% auto 0;
+}
+
+.white-box {
+    background: #fff;
+    padding: 25px;
+    margin-bottom: 15px;
+}
+
+.p-b-20 {
+    padding-bottom: 20px!important;
+}
+
+* {
+    outline: 0!important;
+}
+
+#wrapper {
+    width: 100%;
+    margin: 0 auto;
+    box-shadow: 1px 0 50px rgba(0,0,0,.2);
+}

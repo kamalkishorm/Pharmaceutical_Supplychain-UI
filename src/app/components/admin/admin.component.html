@@ -1,0 +1,181 @@
+<div id="page-wrapper">
+    <main>
+        <section class="admin-header">
+            <div class="row bg-title">
+                <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+                    <h4 class="page-title">Dashboard</h4>
+                </div>
+                <div class="col-lg-4 col-sm-8 col-md-4 col-xs-12"></div>
+                <div class="col-lg-5 col-sm-4 col-md-4 col-xs-12">
+                    <!-- <div class="row"><span class="page-title">Address:</span> &nbsp;<span class="info">{{account}}</span></div>
+                    <div class="row"><span class="page-title">Balance:</span> &nbsp; <span class="info">{{balance}} Eth</span></div> -->
+                </div>
+            </div>
+        </section>
+        <section class="admin-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-info" id="divOngoingTransaction" style="display: none">Ongoing Transaction:
+                        <span id="linkOngoingTransaction">None</span> </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 col-sm-6 col-xs-12">
+                    <div class="white-box">
+                        <h3 class="box-title">Account Address&nbsp; <i class="fa fa-qrcode fa-2x text-success"></i></h3>
+                        <ul class="list-inline two-part">
+                            <li class="text-right" id="currentUserAddress">
+                                <a href="https://ropsten.etherscan.io/address/{{account}}" target="_blank">{{account}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-sm-6 col-xs-12">
+                    <div class="white-box">
+                        <h3 class="box-title">Ethereum Balance&nbsp; <i class="fab fa-ethereum fa-2x"></i></h3>
+                        <ul class="list-inline two-part">
+                            <li class="text-right" id="currentUserBalance">{{balance}} eth</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 col-sm-6 col-xs-12">
+                    <div class="white-box">
+                        <h3 class="box-title">Contract Address&nbsp;<i class="fa fa-qrcode fa-2x text-danger"></i></h3>
+                        <ul class="list-inline two-part">
+                            <li class="text-right" id="supplyChainContractAddress">
+                                <a href="https://ropsten.etherscan.io/address/{{contractAddress}}" target="_blank">
+                                    {{contractAddress}}</a>
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+                <div class="col-lg-6 col-sm-6 col-xs-12">
+                    <div class="white-box">
+                        <h3 class="box-title">User Count&nbsp; <i class="fa fa-user fa-2x text-success"></i></h3>
+                        <ul class="list-inline two-part">
+                            <li class="text-right" id="userCount">{{userCount}}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- <div class="col-md-12 col-lg-3 col-sm-12">
+            </div> -->
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                    <div class="white-box">
+
+                        <div class="row" style="padding: 0px 0px 10px 0px">
+                            <div class="col-md-6">
+                                <h3 class="box-title ">Users</h3>
+                            </div>
+                            <div class="col-md-6" style="text-align: right;">
+                                <button mat-raised-button data-toggle="modal" data-target="#createuser1">Create User</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-lg-12 col-sm-12">
+
+                                <ng-container *ngIf="user_list">
+                                    <div class="mat-elevation-z8">
+                                        <table mat-table [dataSource]="dataSource">
+                                            <ng-container matColumnDef="ethaddress">
+                                                <th mat-header-cell *matHeaderCellDef> EthAddress </th>
+                                                <td mat-cell *matCellDef="let element"> {{element.EthAddress}} </td>
+                                            </ng-container>
+                                            <ng-container matColumnDef="name">
+                                                <th mat-header-cell *matHeaderCellDef> Name </th>
+                                                <td mat-cell *matCellDef="let element"> {{element.Name}} </td>
+                                            </ng-container>
+                                            <ng-container matColumnDef="location">
+                                                <th mat-header-cell *matHeaderCellDef> Location </th>
+                                                <td mat-cell *matCellDef="let element"> {{element.Location}} </td>
+                                            </ng-container>
+                                            <ng-container matColumnDef="role">
+                                                <th mat-header-cell *matHeaderCellDef> Role </th>
+                                                <td mat-cell *matCellDef="let element"> {{element.Role}} </td>
+                                            </ng-container>
+
+                                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                                        </table>
+
+                                        <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="col-md-12 col-lg-3 col-sm-12">
+            </div> -->
+            </div>
+        </section>
+    </main>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="createuser1">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="z-index:11;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">User Register</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form [formGroup]="registerUser">
+                        <div class="form-group">
+                            <label for="EthAddress1">EthAddress</label>
+                            <input type="text" formControlName="ethaddress" class="form-control" id="EthAddress1"
+                                aria-describedby="ethHelp" placeholder="Enter Ethereum Address">
+                            <small id="ethHelp" class="form-text text-muted">Please provide user valid public ethereum
+                                address.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="Name1">Name</label>
+                            <input type="email" formControlName="name" class="form-control" id="Name1" aria-describedby="nameHelp"
+                                placeholder="Enter Name">
+                            <small id="nameHelp" class="form-text text-muted">Name must be under 16 char.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="location1">Location</label>
+
+                            <div class="row" formGroupName="location" id="sublocation">
+                                <div class="col">
+                                    <label for="latitude1">Lat</label>
+                                    <input type="text" formControlName="latitude" class="form-control" id="latitude1"
+                                        placeholder="Latitude">
+                                </div>
+                                <div class="col">
+                                    <label for="longitude1">Long</label>
+                                    <input type="text" formControlName="longitude" class="form-control" id="longitude1"
+                                        placeholder="Longitude">
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="role1">Select Role</label>
+                            <select class="form-control" formControlName="rrole" id="role1">
+                                <option *ngFor="let rr of Roles" [value]="rr.value">{{rr.role}}</option>
+                            </select>
+                        </div>
+                        <!-- <button type="submit" [disabled]="!registerUser.valid" class="btn btn-primary">Submit</button> -->
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss = "modal" (click)="userRegister()"
+                        [disabled]="!registerUser.valid">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
