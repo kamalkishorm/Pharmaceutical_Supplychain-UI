@@ -13,3 +13,36 @@
 body {
     background-color: whitesmoke
 }
+#page-wrapper {
+    position: inherit;
+    margin: 0;
+    width: -webkit-fill-available;
+    height: -webkit-fill-available;
+    padding: 0px 25px 25px 25px;
+}
+.white-box {
+    background: #fff;
+    padding: 25px;
+    margin-bottom: 15px;
+}
+
+.bg-title {
+    border-bottom: 1px solid #e4e7ea;
+    overflow: hidden;
+    padding: 10px 10px 5px;
+    margin-bottom: 25px;
+    margin-left: -25.5px;
+    margin-right: -25.5px;
+}
+table {
+    width: 100%;
+}
+
+td.mat-cell {
+    padding: 0px 5px 0px 5px;
+}
+th.mat-header-cell {
+    padding: 15px 5px 0px 5px;
+    font-size: 15px;
+    font-weight: 300;
+}

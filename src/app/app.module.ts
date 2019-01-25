@@ -11,6 +11,7 @@ import { HeaderComponent } from './shared/header/header.component';
 import { FooterComponent } from './shared/footer/footer.component';
 import { AppMaterialModule } from './app.material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TestComponent } from './components/testcomponents/testcomponent.component'
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     AdminComponent,
     SupplierComponent,
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
+    TestComponent
   ],
   imports: [
     BrowserModule,

@@ -1,42 +1,196 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ViewChild, } from '@angular/core';
 import { EthcontractService } from '../../ethcontract.service';
 import { Router } from '@angular/router';
+import { MatPaginator, MatTableDataSource } from '@angular/material';
+import { RawMaterial } from './rawmattable';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { FormBuilder, Validators, FormControl, NgSelectOption } from '@angular/forms';
+import { async } from 'q';
+import * as $ from 'jquery';
 
 @Component({
+  selector: 'app-user-supplier',
   templateUrl: './supplier.component.html',
   styleUrls: ['./supplier.component.css']
 })
-export class SupplierComponent {
+export class SupplierComponent implements OnInit {
 
   account = "0x0";
   balance = '0 ETH';
   amount = 0;
-  role:any;
+  name: any;
+  location: any;
+  role: any;
+  packageCount: any;
+  Roles = {
+    0: "NoRole",
+    1: "Supplier",
+    3: "Transporter",
+    4: "Manufacturer",
+    5: "Wholesaler",
+    6: "Distributer",
+    7: "Pharma",
+    8: "Role Revoked"
+  }
+  package_list = [];
+  displayedColumns: string[] = [
+    'batchid',
+    'description',
+    'farmername',
+    'location',
+    'quantity',
+    'shipper',
+    'receiver',
+    'star'
+  ];
+
+  packageInfo = {};
+
+  dataSource: MatTableDataSource<RawMaterial>;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(
+    private modalService: NgbModal,
     private router: Router,
-    private ethcontractService: EthcontractService
-    ) {
+    private ethcontractService: EthcontractService,
+    private fb: FormBuilder
+  ) {
+    localStorage.setItem('packageidpointer', 0 + '');
     this.initAndDisplayAccount();
   }
+
+  ngOnInit() { }
+
   initAndDisplayAccount = () => {
     let that = this;
-    this.ethcontractService.getRole().then(function (acctInfo:any) {
+    this.ethcontractService.getRole().then(function (acctInfo: any) {
+      console.log(acctInfo)
+
       that.account = acctInfo.Account;
       that.balance = acctInfo.Balance;
-      that.role = JSON.stringify(acctInfo.Role,null, '\t');
-      console.log(that.role);
-      // window.acc = that.role;
-      console.log(acctInfo)
-      if(acctInfo.Role.Role != 1){
+      that.name = acctInfo.Role.Name;
+      that.location = acctInfo.Role.Location;
+      that.role = that.Roles[acctInfo.Role.Role];
+
+      if (acctInfo.Role.Role != 1) {
         window.alert("User is not Supplier.")
         that.router.navigate(['/']);
+      } else {
+        that.getPackageCount();
       }
+
     }).catch(function (error) {
       console.log(error);
       that.router.navigate(['/']);
 
     });
+  }
+
+  getPackageCount = async () => {
+    let that = this;
+    await this.ethcontractService.getPackageCount().then(function (packageCount: any) {
+      console.log(packageCount);
+      that.packageCount = packageCount;
+    })
+    that.getPackageInfo();
+  }
+
+  getPackageInfo = async () => {
+    let that = this;
+    console.log(that.packageCount)
+    // that.package_list = [];
+    let itrate = true;
+    let from = Number(localStorage.getItem('packageidpointer'));
+    let to: Number;
+    if (that.packageCount < from + 5) {
+      to = that.packageCount;
+      localStorage.setItem('packageidpointer', to + '');
+      itrate = false;
+    } else if (that.packageCount > from + 5) {
+      to = from + 5;
+      localStorage.setItem('packageidpointer', to + '');
+    }
+    let i: number;
+    for (i = from; i < to; i++) {
+      await this.ethcontractService.getPackageBatchID(i).then(async function (batchid: any) {
+        if (batchid) {
+          console.log(batchid);
+          await that.ethcontractService.getPackageBatchIDDetails(batchid).then(function (packageinfo: any) {
+            if (packageinfo) {
+              console.log(packageinfo);
+              let jsonres = {
+                "BatchID": batchid,
+                "Description": packageinfo.Description,
+                "FarmerName": packageinfo.FarmerName,
+                "FarmLocation": packageinfo.FarmLocation,
+                "Quantity": packageinfo.Quantity,
+                "Shipper": packageinfo.Shipper,
+                "Receiver": packageinfo.Receiver,
+                "Supplier": packageinfo.Supplier
+              }
+              that.package_list.push(jsonres);
+            }
+          });
+        }
+      }).catch(function (error) {
+        console.log(error);
+      });
+    }
+
+    console.log(that.package_list);
+    this.dataSource = new MatTableDataSource<RawMaterial>(that.package_list);
+    this.dataSource.paginator = this.paginator;
+    console.log(that.dataSource);
+    if (itrate) {
+      that.getPackageInfo();
+    }
+  }
+
+  getPackageTx = (selectedBatchID) => {
+    let that = this;
+    console.log(selectedBatchID);
+    that.packageInfo['Status'] = -1;
+    this.ethcontractService.getRawMatrialStatus(selectedBatchID.BatchID).then(function (response: any) {
+      if (response) {
+        that.packageInfo['Batch'] = selectedBatchID;
+        that.ethcontractService.getUsers(selectedBatchID.Shipper).then(function (shipperInfo: any) {
+          if (shipperInfo) {
+            console.log(shipperInfo);
+            that.packageInfo['Shipper'] = shipperInfo.result;
+            that.ethcontractService.getUsers(selectedBatchID.Receiver).then(function (manufacturerInfo: any) {
+              if (manufacturerInfo) {
+                console.log(manufacturerInfo);
+                that.packageInfo['Manufacturer'] = manufacturerInfo.result;
+                that.packageInfo['Status'] = response.Status;
+
+                console.log(that.packageInfo);
+              }
+            });
+          }
+        });
+        console.log(response.Status);
+        switch (response.Status) {
+          case 0:
+            {
+              console.log("At Creator");
+              break;
+            }
+          case 1:
+            {
+              console.log("Picked Up");
+              break;
+            }
+          case 2:
+            {
+              console.log("Delivered");
+              break;
+            }
+        }
+      }
+    }).catch(function (error) {
+      console.log(error);
+    });
+
   }
 
 }

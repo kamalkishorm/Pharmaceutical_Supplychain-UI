@@ -5,6 +5,8 @@ import { HomeComponent } from './components/home/home.component';
 import { AdminComponent } from './components/admin/admin.component'
 import { UserComponent } from './components/user/user.component'
 import { SupplierComponent } from './components/supplier/supplier.component'
+import { TestComponent } from './components/testcomponents/testcomponent.component'
+
 
 
 const routes: Routes = [
@@ -27,6 +29,11 @@ const routes: Routes = [
     path: 'admin',
     component: AdminComponent,
     data: { title: 'Admin Page' }
+  },
+  {
+    path: 'test',
+    component: TestComponent,
+    data: { title: 'Test Page' }
   },
   { path: '',
     redirectTo: '/home',

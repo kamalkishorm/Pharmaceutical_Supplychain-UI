@@ -2,6 +2,7 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
 import {ScrollingModule} from '@angular/cdk/scrolling';
 import {CdkTableModule} from '@angular/cdk/table';
 import {CdkTreeModule} from '@angular/cdk/tree';
+import {A11yModule} from '@angular/cdk/a11y';
 import {NgModule} from '@angular/core';
 import {
   MatAutocompleteModule,
@@ -87,7 +88,8 @@ import {
     MatTooltipModule,
     MatTreeModule,
     ScrollingModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    A11yModule
   ]
 })
 export class AppMaterialModule {}
