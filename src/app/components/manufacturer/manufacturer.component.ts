@@ -46,12 +46,26 @@ export class ManufacturerComponent implements OnInit {
     'description',
     'farmername',
     'location',
+    'initquantity',
+    'usedquantity',
+    'shipper',
+    'receiver',
+    'status',
+    'star'
+  ];
+
+  displayedMedicineColumns: string[] = [
+    'batchid',
+    'description',
+    'farmername',
+    'location',
     'quantity',
     'shipper',
     'receiver',
     'status',
     'star'
   ];
+
 
   packageInfo = {};
   packageDetails = this.fb.group({
@@ -80,7 +94,7 @@ export class ManufacturerComponent implements OnInit {
       })
     ])
   });;
-  MedicineSource: MatTableDataSource<RawMaterial>;
+  MedicineSource: MatTableDataSource<Medicine>;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   rawreceivepid = this.fb.group({
@@ -145,7 +159,7 @@ export class ManufacturerComponent implements OnInit {
   rawPackageReceived = () => {
     let that = this;
     var formdata = {
-      pid: this.rawreceivepid.value.pid
+      PackageID: this.rawreceivepid.value.pid
     }
     console.log(formdata);
 
@@ -176,18 +190,19 @@ export class ManufacturerComponent implements OnInit {
     }
     let i: number;
     for (i = from; i < to; i++) {
-      await this.ethcontractService.getPackageBatchIDM(i).then(async function (batchid: any) {
+      await this.ethcontractService.getPackageIDByIndexM({Index:i}).then(async function (batchid: any) {
         if (batchid) {
           console.log(batchid);
-          await that.ethcontractService.getPackageBatchIDDetails(batchid).then(function (packageinfo: any) {
+          await that.ethcontractService.getPackageBatchIDDetails({BatchID:batchid[0]}).then(function (packageinfo: any) {
             if (packageinfo) {
               console.log(packageinfo);
               let jsonres = {
-                "BatchID": batchid,
+                "BatchID": batchid[0],
                 "Description": packageinfo.Description,
                 "FarmerName": packageinfo.FarmerName,
                 "FarmLocation": packageinfo.FarmLocation,
-                "Quantity": packageinfo.Quantity,
+                "InitQuantity": packageinfo.Quantity,
+                "UsedQuantity": batchid[1],
                 "Shipper": packageinfo.Shipper,
                 "Receiver": packageinfo.Receiver,
                 "Supplier": packageinfo.Supplier,
@@ -215,14 +230,14 @@ export class ManufacturerComponent implements OnInit {
     let that = this;
     console.log(selectedBatchID);
     that.packageInfo['Status'] = -1;
-    this.ethcontractService.getRawMatrialStatus(selectedBatchID.BatchID).then(function (response: any) {
+    this.ethcontractService.getRawMatrialStatus({BatchID:selectedBatchID.BatchID}).then(function (response: any) {
       if (response) {
         that.packageInfo['Batch'] = selectedBatchID;
-        that.ethcontractService.getUsers(selectedBatchID.Shipper).then(function (shipperInfo: any) {
+        that.ethcontractService.getUsers({AccountAddress:selectedBatchID.Shipper}).then(function (shipperInfo: any) {
           if (shipperInfo) {
             console.log(shipperInfo);
             that.packageInfo['Shipper'] = shipperInfo.result;
-            that.ethcontractService.getUsers(selectedBatchID.Receiver).then(function (manufacturerInfo: any) {
+            that.ethcontractService.getUsers({AccountAddress:selectedBatchID.Receiver}).then(function (manufacturerInfo: any) {
               if (manufacturerInfo) {
                 console.log(manufacturerInfo);
                 that.packageInfo['Manufacturer'] = manufacturerInfo.result;

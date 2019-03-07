@@ -100,7 +100,10 @@ export class AdminComponent implements OnInit {
     }
     let i: number;
     for (i = from; i < to; i++) {
-      await this.ethcontractService.getUserProfile(i).then(function (userInfoList: any) {
+      let formdata = {
+        Index:i
+      }
+      await this.ethcontractService.getUserProfile(formdata).then(function (userInfoList: any) {
         if (userInfoList) {
           userInfoList.result.Role = that.Roles[userInfoList.result.Role].role;
           that.user_list.push(userInfoList.result);

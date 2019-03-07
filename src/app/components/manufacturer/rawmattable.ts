@@ -3,7 +3,8 @@ export interface RawMaterial {
     Description: String;
     FarmerName: String;
     FarmLocation: String;
-    Quantity: Number;
+    InitQuantity: Number;
+    UsedQuantity: Number;
     Shipper: String;
     Receiver: String;
 }

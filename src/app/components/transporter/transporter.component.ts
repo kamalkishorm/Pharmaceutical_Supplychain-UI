@@ -54,7 +54,16 @@ export class TransporterComponent implements OnInit {
   ];
 
   packageInfo = {
-    Status:0
+    Status: 0,
+    Batch: {
+      Done: false
+    },
+    Shipper: {
+      Done: false
+    },
+    Manufacturer: {
+      Done: false
+    }
   };
   packageDetails = this.fb.group({
     description: ['', [Validators.required, Validators.maxLength(16)]],
@@ -134,12 +143,12 @@ export class TransporterComponent implements OnInit {
     console.log(from, to)
     let i: number;
     for (i = from; i < to; i++) {
-      await this.ethcontractService.getTransportBatchIdByIndex(i).then(async function (transportationReq: any) {
+      await this.ethcontractService.getTransportBatchIdByIndex({ Index: i }).then(async function (transportationReq: any) {
         if (transportationReq) {
           console.log(transportationReq);
           switch (transportationReq.tarnsType) {
             case 0:
-              await that.ethcontractService.getPackageBatchIDDetails(transportationReq.consignmentID).then(function (packageinforesult: any) {
+              await that.ethcontractService.getPackageBatchIDDetails({ BatchID: transportationReq.consignmentID }).then(function (packageinforesult: any) {
                 if (packageinforesult) {
                   console.log(packageinforesult);
                   let jsonres = {
@@ -183,14 +192,14 @@ export class TransporterComponent implements OnInit {
     console.log(selectedBatchID);
     // that.packageInfo['Status'] = -1;
     that.packageInfo['TxType'] = 1;
-    this.ethcontractService.getRawMatrialStatus(selectedBatchID.BatchID).then(function (response: any) {
+    this.ethcontractService.getRawMatrialStatus({ BatchID: selectedBatchID.BatchID }).then(function (response: any) {
       if (response) {
         that.packageInfo['Batch'] = selectedBatchID;
-        that.ethcontractService.getUsers(selectedBatchID.Shipper).then(function (shipperInfo: any) {
+        that.ethcontractService.getUsers({ AccountAddress: selectedBatchID.Shipper }).then(function (shipperInfo: any) {
           if (shipperInfo) {
             console.log(shipperInfo);
             that.packageInfo['Shipper'] = shipperInfo.result;
-            that.ethcontractService.getUsers(selectedBatchID.Receiver).then(function (manufacturerInfo: any) {
+            that.ethcontractService.getUsers({ AccountAddress: selectedBatchID.Receiver }).then(function (manufacturerInfo: any) {
               if (manufacturerInfo) {
                 console.log(manufacturerInfo);
                 that.packageInfo['Manufacturer'] = manufacturerInfo.result;
@@ -238,11 +247,11 @@ export class TransporterComponent implements OnInit {
     console.log(this.packageDetails.value);
     let that = this;
     var formdata = {
-      pid: pid,
-      transportertype: txtype,
-      cid: cid
+      PackageID: pid,
+      TransporterType: txtype,
+      SubContractID: cid
     }
-console.log(formdata)
+    console.log(formdata)
     this.ethcontractService.loadConsingment(formdata).then(function (txhash: any) {
       if (txhash) {
         console.log(txhash);
@@ -252,7 +261,7 @@ console.log(formdata)
       console.log(error);
     });
   }
- 
+
 
   handleTransactionResponse = (txHash) => {
     var txLink = "https://ropsten.etherscan.io/tx/" + txHash;

@@ -52,7 +52,16 @@ export class SupplierComponent implements OnInit {
   ];
 
   packageInfo = {
-    Status:0
+    Status:0,
+    Batch:{
+      Done:false
+    },
+    Shipper:{
+      Done:false
+    },
+    Manufacturer:{
+      Done:false
+    }
   };
   packageDetails = this.fb.group({
     description: ['', [Validators.required, Validators.maxLength(16)]],
@@ -132,10 +141,10 @@ export class SupplierComponent implements OnInit {
     let i: number;
     console.log(from,to)
     for (i = from; i < to; i++) {
-      await this.ethcontractService.getPackageBatchID(i).then(async function(batchid: any) {
+      await this.ethcontractService.getPackageBatchID({Index:i}).then(async function(batchid: any) {
         if (batchid) {
           console.log(batchid);
-          await that.ethcontractService.getPackageBatchIDDetails(batchid).then(function(packageinforesult: any) {
+          await that.ethcontractService.getPackageBatchIDDetails({BatchID:batchid}).then(function(packageinforesult: any) {
             if (packageinforesult) {
               console.log(packageinforesult);
               let jsonres = {
@@ -171,14 +180,14 @@ export class SupplierComponent implements OnInit {
     let that = this;
     console.log(selectedBatchID);
     that.packageInfo.Status = -1;
-    this.ethcontractService.getRawMatrialStatus(selectedBatchID.BatchID).then(function(response: any) {
+    this.ethcontractService.getRawMatrialStatus({BatchID:selectedBatchID.BatchID}).then(function(response: any) {
       if (response) {
         that.packageInfo['Batch'] = selectedBatchID;
-        that.ethcontractService.getUsers(selectedBatchID.Shipper).then(function(shipperInfo: any) {
+        that.ethcontractService.getUsers({AccountAddress:selectedBatchID.Shipper}).then(function(shipperInfo: any) {
           if (shipperInfo) {
             console.log(shipperInfo);
             that.packageInfo['Shipper'] = shipperInfo.result;
-            that.ethcontractService.getUsers(selectedBatchID.Receiver).then(function(manufacturerInfo: any) {
+            that.ethcontractService.getUsers({AccountAddress: selectedBatchID.Receiver}).then(function(manufacturerInfo: any) {
               if (manufacturerInfo) {
                 console.log(manufacturerInfo);
                 that.packageInfo['Manufacturer'] = manufacturerInfo.result;
@@ -204,9 +213,9 @@ export class SupplierComponent implements OnInit {
                   case 2:
                     {
                       console.log("Delivered");
-                      that.packageInfo['Batch']['Done'] = true;
-                      that.packageInfo['Shipper']['Done'] = true;
-                      that.packageInfo['Manufacturer']['Done'] = true;
+                      that.packageInfo.Batch.Done = true;
+                      that.packageInfo.Shipper.Done = true;
+                      that.packageInfo.Manufacturer.Done = true;
                       break;
                     }
                 }
