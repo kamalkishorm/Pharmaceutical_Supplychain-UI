@@ -5,6 +5,8 @@ import { HomeComponent } from './components/home/home.component';
 import { AdminComponent } from './components/admin/admin.component'
 import { UserComponent } from './components/user/user.component'
 import { SupplierComponent } from './components/supplier/supplier.component'
+import { ManufacturerComponent } from './components/manufacturer/manufacturer.component'
+import { TransporterComponent } from './components/transporter/transporter.component'
 import { TestComponent } from './components/testcomponents/testcomponent.component'
 
 
@@ -23,7 +25,17 @@ const routes: Routes = [
   {
     path: 'supplier',
     component: SupplierComponent,
-    data: { title: 'User Page' }
+    data: { title: 'Supplier Page' }
+  },
+  {
+    path: 'manufacturer',
+    component: ManufacturerComponent,
+    data: { title: 'Manufacturer Page' }
+  },
+  {
+    path: 'transporter',
+    component: TransporterComponent,
+    data: { title: 'Transporter Page' }
   },
   {
     path: 'admin',
@@ -35,7 +47,8 @@ const routes: Routes = [
     component: TestComponent,
     data: { title: 'Test Page' }
   },
-  { path: '',
+  {
+    path: '',
     redirectTo: '/home',
     pathMatch: 'full'
   },

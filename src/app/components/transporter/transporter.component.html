@@ -1,6 +1,6 @@
 <div id="page-wrapper">
     <main>
-        <section class="supplier-header">
+        <section class="transporter-header">
             <div class="row bg-title">
                 <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
                     <h4 class="page-title">Dashboard</h4>
@@ -14,7 +14,7 @@
                 </div>
             </div>
         </section>
-        <section class="supplier-body">
+        <section class="transporter-body">
             <div class="row">
                 <div class="col-md-12">
                     <div class="alert alert-info" id="divOngoingTransaction" style="display: none">Recent Transaction:
@@ -66,11 +66,11 @@
 
                         <div class="row" style="padding: 0px 0px 10px 0px">
                             <div class="col-md-6">
-                                <h3 class="box-title ">Packages
+                                <h3 class="box-title">Consignment
                                     &nbsp;
                                     <span style="color:blue">{{packageCount}}</span>
                                     &nbsp;
-                                    <button type="button" class="btn btn-default btn-sm" (click)="getPackageCount()">
+                                    <button type="button" class="btn btn-default btn-sm" (click)="transportCount()">
                                         <img src="https://img.icons8.com/material/24/000000/update-left-rotation.png">
                                     </button>
                                 </h3>
@@ -87,6 +87,10 @@
                                     <div class="mat-elevation-z8 ">
                                         <div class="table-specification">
                                             <table mat-table [dataSource]="dataSource">
+                                                    <ng-container matColumnDef="txtype">
+                                                            <th mat-header-cell *matHeaderCellDef> Transporter Type </th>
+                                                            <td mat-cell *matCellDef="let element"> {{element.TxType}} </td>
+                                                        </ng-container>
                                                 <ng-container matColumnDef="batchid" sticky>
                                                     <th mat-header-cell *matHeaderCellDef> BatchID </th>
                                                     <td mat-cell *matCellDef="let element">
@@ -97,15 +101,15 @@
                                                         </button>
                                                     </td>
                                                 </ng-container>
-                                                <ng-container matColumnDef="description">
+                                                <!-- <ng-container matColumnDef="description">
                                                     <th mat-header-cell *matHeaderCellDef> Description </th>
                                                     <td mat-cell *matCellDef="let element"> {{element.Description}}
                                                     </td>
-                                                </ng-container>
-                                                <ng-container matColumnDef="farmername">
+                                                </ng-container> -->
+                                                <!-- <ng-container matColumnDef="farmername">
                                                     <th mat-header-cell *matHeaderCellDef> Farmer Name </th>
                                                     <td mat-cell *matCellDef="let element"> {{element.FarmerName}} </td>
-                                                </ng-container>
+                                                </ng-container> -->
                                                 <ng-container matColumnDef="location">
                                                     <th mat-header-cell *matHeaderCellDef> Location </th>
                                                     <td mat-cell *matCellDef="let element"> {{element.FarmLocation}}
@@ -115,12 +119,12 @@
                                                     <th mat-header-cell *matHeaderCellDef> Quantity </th>
                                                     <td mat-cell *matCellDef="let element"> {{element.Quantity}} </td>
                                                 </ng-container>
-                                                <ng-container matColumnDef="shipper">
-                                                    <th mat-header-cell *matHeaderCellDef> Shipper </th>
-                                                    <td mat-cell *matCellDef="let element"> {{element.Shipper}} </td>
+                                                <ng-container matColumnDef="from">
+                                                    <th mat-header-cell *matHeaderCellDef> Sender </th>
+                                                    <td mat-cell *matCellDef="let element"> {{element.Supplier}} </td>
                                                 </ng-container>
-                                                <ng-container matColumnDef="receiver">
-                                                    <th mat-header-cell *matHeaderCellDef> Manufacturer </th>
+                                                <ng-container matColumnDef="to">
+                                                    <th mat-header-cell *matHeaderCellDef> Reciever </th>
                                                     <td mat-cell *matCellDef="let element"> {{element.Receiver}} </td>
                                                 </ng-container>
                                                 <ng-container matColumnDef="status">
@@ -156,6 +160,10 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLongTitle">BatchID:
                     </h5>
+                    <div id="pick-deliver" >
+                        <button type="button" class="btn btn-success" *ngIf="packageInfo.Status == 0 " (click)="pickPackage(packageInfo.Batch.BatchID,packageInfo.TxType,packageInfo.Batch.BatchID)">Pick</button>
+                        <!-- <button type="button" class="btn btn-success" *ngIf="packageInfo.Status == 1 " (click)="rawPackageReceived(packageInfo.Batch.BatchID)">Recieve</button> -->
+                    </div>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -259,7 +267,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="createpackage1">
+    <!-- <div class="modal fade" id="createpackage1">
         <div class="modal-dialog modal-dialog-centered" role="document" style="z-index:11;">
             <div class="modal-content">
                 <div class="modal-header">
@@ -321,7 +329,6 @@
                                 ethereum
                                 address.</small>
                         </div>
-                        <!-- <button type="submit" [disabled]="!registerUser.valid" class="btn btn-primary">Submit</button> -->
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -331,6 +338,6 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
 </div>

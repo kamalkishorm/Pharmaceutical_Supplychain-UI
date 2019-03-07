@@ -139,7 +139,6 @@ export class AdminComponent implements OnInit {
       Name: this.registerUser.value.name,
       Location: this.registerUser.value.location.latitude + "_" + this.registerUser.value.location.longitude,
       Role: this.registerUser.value.rrole
-
     }
     console.log(formdata);
     let that = this;

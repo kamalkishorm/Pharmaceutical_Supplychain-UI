@@ -14,24 +14,24 @@ export class UserComponent {
   account = "0x0";
   balance = '0 ETH';
   amount = 0;
-  role:any;
+  role: any;
 
   constructor(
     private router: Router,
     private ethcontractService: EthcontractService
-    ) {
+  ) {
     this.initAndDisplayAccount();
   }
   initAndDisplayAccount = () => {
     let that = this;
-    this.ethcontractService.getRole().then(function (acctInfo:any) {
+    this.ethcontractService.getRole().then(function(acctInfo: any) {
       that.account = acctInfo.Account;
       that.balance = acctInfo.Balance;
       that.role = acctInfo.Role.Role;
-      
+
       console.log(acctInfo.Role);
       console.log(that.role);
-      switch(that.role+""){
+      switch (that.role + "") {
         case '0':
           window.alert("User Information does not found.")
           that.router.navigate(['']);
@@ -39,11 +39,17 @@ export class UserComponent {
         case '1':
           that.router.navigate(['/supplier']);
           break;
-        default :
-          window.alert("User infoemation doesnot found: " + that.role)
+        case '2':
+          that.router.navigate(['/transporter']);
+          break;
+        case '3':
+          that.router.navigate(['/manufacturer']);
+          break;
+        default:
+          window.alert("User information doesnot found: " + that.role)
           break;
       }
-    }).catch(function (error) {
+    }).catch(function(error) {
       console.log(error);
       // that.router.navigate(['/']);
     });

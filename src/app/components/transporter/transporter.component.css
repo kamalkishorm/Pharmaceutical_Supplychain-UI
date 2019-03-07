@@ -142,3 +142,7 @@ h3.box-title {
     padding-right: 25px;
     color: green;
 }
+div#pick-deliver {
+    width: 80%;
+    text-align: right;
+}

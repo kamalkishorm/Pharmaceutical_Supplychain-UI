@@ -1,6 +1,6 @@
 <div id="page-wrapper">
     <main>
-        <section class="supplier-header">
+        <section class="manufacturer-header">
             <div class="row bg-title">
                 <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
                     <h4 class="page-title">Dashboard</h4>
@@ -14,7 +14,7 @@
                 </div>
             </div>
         </section>
-        <section class="supplier-body">
+        <section class="manufacturer-body">
             <div class="row">
                 <div class="col-md-12">
                     <div class="alert alert-info" id="divOngoingTransaction" style="display: none">Recent Transaction:
@@ -66,18 +66,18 @@
 
                         <div class="row" style="padding: 0px 0px 10px 0px">
                             <div class="col-md-6">
-                                <h3 class="box-title ">Packages
+                                <h3 class="box-title ">Raw Packages
                                     &nbsp;
-                                    <span style="color:blue">{{packageCount}}</span>
+                                    <span style="color:blue">{{rawPackageCount}}</span>
                                     &nbsp;
-                                    <button type="button" class="btn btn-default btn-sm" (click)="getPackageCount()">
+                                    <button type="button" class="btn btn-default btn-sm" (click)="getPackagesCountM()">
                                         <img src="https://img.icons8.com/material/24/000000/update-left-rotation.png">
                                     </button>
                                 </h3>
-
                             </div>
                             <div class="col-md-6" style="text-align: right;">
-                                <button mat-raised-button data-toggle="modal" data-target="#createpackage1">Create Package</button>
+                                <button mat-raised-button data-toggle="modal" data-target="#rawpackagerecieve1">Raw
+                                    Package Recieve</button>
                             </div>
                         </div>
                         <div class="row">
@@ -86,7 +86,7 @@
                                 <ng-container>
                                     <div class="mat-elevation-z8 ">
                                         <div class="table-specification">
-                                            <table mat-table [dataSource]="dataSource">
+                                            <table mat-table [dataSource]="rawSource">
                                                 <ng-container matColumnDef="batchid" sticky>
                                                     <th mat-header-cell *matHeaderCellDef> BatchID </th>
                                                     <td mat-cell *matCellDef="let element">
@@ -127,7 +127,93 @@
                                                     <th mat-header-cell *matHeaderCellDef> Status </th>
                                                     <td mat-cell *matCellDef="let element"> {{element.Status}} </td>
                                                 </ng-container>
-                                                <!-- Star Column -->
+                                                <ng-container matColumnDef="star" stickyEnd>
+                                                    <th mat-header-cell *matHeaderCellDef></th>
+                                                    <td mat-cell *matCellDef="let element">
+                                                        <mat-icon>more_vert</mat-icon>
+                                                    </td>
+                                                </ng-container>
+                                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                                            </table>
+                                        </div>
+                                        <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-lg-12 col-sm-12">
+                    <div class="white-box">
+
+                        <div class="row" style="padding: 0px 0px 10px 0px">
+                            <div class="col-md-6">
+                                <h3 class="box-title ">Manufacturer Batch
+                                    &nbsp;
+                                    <span style="color:blue">{{batchCount}}</span>
+                                    &nbsp;
+                                    <button type="button" class="btn btn-default btn-sm" (click)="getBatchesCountM()">
+                                        <img src="https://img.icons8.com/material/24/000000/update-left-rotation.png">
+                                    </button>
+                                </h3>
+
+                            </div>
+                            <div class="col-md-6" style="text-align: right;">
+                                <button mat-raised-button data-toggle="modal" data-target="#createbatch1">Create
+                                    Batch</button>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-lg-12 col-sm-12">
+
+                                <ng-container>
+                                    <div class="mat-elevation-z8 ">
+                                        <div class="table-specification">
+                                            <table mat-table [dataSource]="MedicineSource">
+                                                <ng-container matColumnDef="batchid" sticky>
+                                                    <th mat-header-cell *matHeaderCellDef> BatchID </th>
+                                                    <td mat-cell *matCellDef="let element">
+                                                        <button type="button" class="btn btn-default btn-sm hh"
+                                                            data-toggle="modal" data-target="#batchidinfo1" data-id="{{element.BatchID}}"
+                                                            (click)="getPackageTx(element)">
+                                                            {{element.BatchID}}
+                                                        </button>
+                                                    </td>
+                                                </ng-container>
+                                                <ng-container matColumnDef="description">
+                                                    <th mat-header-cell *matHeaderCellDef> Description </th>
+                                                    <td mat-cell *matCellDef="let element"> {{element.Description}}
+                                                    </td>
+                                                </ng-container>
+                                                <ng-container matColumnDef="farmername">
+                                                    <th mat-header-cell *matHeaderCellDef> Farmer Name </th>
+                                                    <td mat-cell *matCellDef="let element"> {{element.FarmerName}} </td>
+                                                </ng-container>
+                                                <ng-container matColumnDef="location">
+                                                    <th mat-header-cell *matHeaderCellDef> Location </th>
+                                                    <td mat-cell *matCellDef="let element"> {{element.FarmLocation}}
+                                                    </td>
+                                                </ng-container>
+                                                <ng-container matColumnDef="quantity">
+                                                    <th mat-header-cell *matHeaderCellDef> Quantity </th>
+                                                    <td mat-cell *matCellDef="let element"> {{element.Quantity}} </td>
+                                                </ng-container>
+                                                <ng-container matColumnDef="shipper">
+                                                    <th mat-header-cell *matHeaderCellDef> Shipper </th>
+                                                    <td mat-cell *matCellDef="let element"> {{element.Shipper}} </td>
+                                                </ng-container>
+                                                <ng-container matColumnDef="receiver">
+                                                    <th mat-header-cell *matHeaderCellDef> Manufacturer </th>
+                                                    <td mat-cell *matCellDef="let element"> {{element.Receiver}} </td>
+                                                </ng-container>
+                                                <ng-container matColumnDef="status">
+                                                    <th mat-header-cell *matHeaderCellDef> Status </th>
+                                                    <td mat-cell *matCellDef="let element"> {{element.Status}} </td>
+                                                </ng-container>
                                                 <ng-container matColumnDef="star" stickyEnd>
                                                     <th mat-header-cell *matHeaderCellDef></th>
                                                     <td mat-cell *matCellDef="let element">
@@ -150,7 +236,7 @@
     </main>
 
     <!-- Modal -->
-    <div class="modal fade" id="batchidinfo1">
+    <!-- <div class="modal fade" id="batchidinfo1">
         <div class="modal-dialog modal-dialog-centered" role="document" style="z-index:11;">
             <div class="modal-content">
                 <div class="modal-header">
@@ -203,7 +289,6 @@
                         </div>
                         <br>
                         <div class="shipperdetails">
-                            <!-- *ngIf="packageInfo.Status > 0" -->
                             <h3 class="box-title">Batch Shipper Info
                             </h3>
 
@@ -227,7 +312,6 @@
                         </div>
                         <br>
                         <div class="manufacturerdetails">
-                            <!-- *ngIf="packageInfo.Status > 1" -->
                             <h3 class="box-title">Batch Manufacturer Info
                             </h3>
 
@@ -253,52 +337,30 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-                    <!-- <button type="button" class="btn btn-primary" data-dismiss="modal">Save Changes</button> -->
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
-    <div class="modal fade" id="createpackage1">
+    <div class="modal fade" id="createbatch1">
         <div class="modal-dialog modal-dialog-centered" role="document" style="z-index:11;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Raw Material Package</h5>
+                    <h5 class="modal-title" id="exampleModalLongTitle">Manufacturer Medicine</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form [formGroup]="packageDetails">
+                    <form [formGroup]="medicineDetails">
                         <div class="form-group">
                             <label for="Description1">Description</label>
                             <input type="text" formControlName="description" class="form-control" id="Description1"
                                 aria-describedby="descriptionHelp" placeholder="Enter Product Description">
-                            <small id="descriptionHelp" class="form-text text-muted">Provide product description.</small>
+                            <small id="descriptionHelp" class="form-text text-muted">Provide Medicine description.</small>
                         </div>
-                        <div class="form-group">
-                            <label for="farmername1">Farmer Name</label>
-                            <input type="text" formControlName="farmername" class="form-control" id="farmername1"
-                                aria-describedby="farmernameHelp" placeholder="Enter Farmer Name">
-                            <small id="farmernameHelp" class="form-text text-muted">Name must be under 16 char.</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="location1">Farm Location</label>
 
-                            <div class="row" formGroupName="location" id="sublocation">
-                                <div class="col">
-                                    <label for="latitude1">Lat</label>
-                                    <input type="text" formControlName="latitude" class="form-control" id="latitude1"
-                                        placeholder="Latitude">
-                                </div>
-                                <div class="col">
-                                    <label for="longitude1">Long</label>
-                                    <input type="text" formControlName="longitude" class="form-control" id="longitude1"
-                                        placeholder="Longitude">
-                                </div>
 
-                            </div>
-                        </div>
                         <div class="form-group">
                             <label for="quantity1">Quantity</label>
                             <input type="number" formControlName="quantity" class="form-control" id="quantity1"
@@ -321,16 +383,69 @@
                                 ethereum
                                 address.</small>
                         </div>
-                        <!-- <button type="submit" [disabled]="!registerUser.valid" class="btn btn-primary">Submit</button> -->
+                        <div formArrayName="rawmaterial">
+                            <h3>Raw Materials</h3>
+                            <button (click)="addRawMat()">Add Raw Material</button>
+
+                            <div *ngFor="let address of rawmaterial.controls; let i=index">
+                                <div formGroupName="i">
+                                    <h3>Raw Material</h3>
+                                    <label>
+                                        Package-ID:
+                                        <input type="text" [formControlName]="pid">
+                                    </label>
+                                    <label>
+                                        Quantity:
+                                        <input type="text" [formControlName]="quantity">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="receivertype1">Receiver Type</label>
+                            <select class="form-control" formControlName="receivertype" id="receivertype1">
+                                <option [value]="1" selected>Wholesaler</option>
+                                <option [value]="2">Distributer</option>
+                            </select>
+                            <small id="receivertypeHelp" class="form-text text-muted">Please select Receiver Type.</small>
+                        </div>
                     </form>
+                    <p>  Form Value: {{ medicineDetails.value | json }}
+                        </p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="createPackage()"
-                        [disabled]="!packageDetails.valid">Save Changes</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="createBatch()"
+                        [disabled]="!medicineDetails.valid">Save Changes</button>
                 </div>
             </div>
         </div>
     </div>
-
+    <div class="modal fade" id="rawpackagerecieve1">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="z-index:11;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Raw Package Recieve</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form [formGroup]="rawreceivepid">
+                        <div class="form-group">
+                            <label for="pid1">Package-ID</label>
+                            <input type="text" formControlName="pid" class="form-control" id="pid1" aria-describedby="pidHelp"
+                                placeholder="Enter Package ID" required>
+                            <small id="pidHelp" class="form-text text-muted">Please provide Package-ID of order.</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" [disabled]="!rawreceivepid.valid"
+                        (click)="rawPackageReceived()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

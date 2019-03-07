@@ -6,7 +6,13 @@ import { ConstantPool } from '@angular/compiler';
 // import { copyFileSync } from 'fs';
 declare let require: any;
 declare let window: any;
-let contract = require('./shared/Contracts/supplychain.json');
+let contract = require('./shared/Contracts/SupplyChain.json');
+let contract_SupplyChain = require('./shared/Contracts/SupplyChain.json');
+let contract_RawMatrials = require('./shared/Contracts/RawMatrials.json');
+let contract_MedicineW_D = require('./shared/Contracts/MedicineW_D.json');
+let contract_MedicineD_P = require('./shared/Contracts/MedicineD_P.json');
+let contract_Medicine = require('./shared/Contracts/Medicine.json');
+
 @Injectable({
   providedIn: 'root'
 })
@@ -16,27 +22,44 @@ export class EthcontractService {
   private web3: any;
   private web3Provider: null;
   private contracts: any;
-  private contractAddress: "0x0000000000000000000000000000000000000000";
   private coinbase: "0x0000000000000000000000000000000000000000";
+
+  private contracts_SupplyChain: any;
+  private contracts_RawMatrials: any;
+  private contracts_MedicineW_D: any;
+  private contracts_MedicineD_P: any;
+  private contracts_Medicine: any;
+
+
+  private contractAddress_SupplyChain: "0x0000000000000000000000000000000000000000";
+
 
   /************************************************* Constructor ***********************************/
   constructor() {
-    if (typeof window.web3 !== 'undefined') {
-      this.web3Provider = window.web3.currentProvider;
-    } else {
-      this.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
-    }
-    window.web3 = new Web3(this.web3Provider);
-    this.web3 = window.web3;
-    this.contracts = this.web3.eth.contract(
-      contract.abi
-    ).at(contract.networks[this.web3.currentProvider.networkVersion].address);
-    window.contract = contract;
-    window.contracts = this.contracts;
-    this.getcoinbase();
-    console.log(this.contracts);
-  }
+    try {
 
+      if (typeof window.web3 !== 'undefined') {
+        this.web3Provider = window.web3.currentProvider;
+      } else {
+        this.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
+      }
+      window.web3 = new Web3(this.web3Provider);
+      this.web3 = window.web3;
+
+      this.contracts_SupplyChain = this.web3.eth.contract(
+        contract_SupplyChain.abi
+      ).at(contract_SupplyChain.networks[this.web3.currentProvider.networkVersion].address);
+
+      this.contractAddress_SupplyChain = contract_SupplyChain.networks[this.web3.currentProvider.networkVersion].address;
+
+      // window.contract = contract;
+      window.contracts = this.contracts_SupplyChain;
+      this.getcoinbase();
+      console.log(this.contracts_SupplyChain);
+    } catch (err) {
+      return err;
+    }
+  }
   /************************************************* Basic *****************************************/
   getcoinbase = () => {
     let that = this;
@@ -72,15 +95,16 @@ export class EthcontractService {
         if (err === null) {
           that.web3.eth.getBalance(account, function (err, balance) {
             if (err === null) {
-              that.contracts.Owner(function (error, ownerAddress) {
+              that.contracts_SupplyChain.Owner(function (error, ownerAddress) {
                 if (!error) {
                   if (ownerAddress == account) {
-                    that.contracts.getUsersCount(function (error, userCount) {
+                    // that.contracts_SupplyChain.getUsersCount(function (error, userCount) {
+                    that.contracts_SupplyChain.getUsersCount(function (error, userCount) {
                       if (!error) {
-                        return resolve({ Account: account, Balance: that.web3.fromWei(balance, "ether"), Role: 'Success', contractAddress: that.contractAddress, UserCount: JSON.parse(userCount) });
+                        return resolve({ Account: account, Balance: that.web3.fromWei(balance, "ether"), Role: 'Success', contractAddress: that.contractAddress_SupplyChain, UserCount: JSON.parse(userCount) });
                       }
                       else
-                        return resolve({ Account: account, Balance: that.web3.fromWei(balance, "ether"), Role: 'Success', contractAddress: that.contractAddress, UserCount: "Error" });
+                        return resolve({ Account: account, Balance: that.web3.fromWei(balance, "ether"), Role: 'Success', contractAddress: that.contractAddress_SupplyChain, UserCount: "Error" });
                     })
                   }
                   else {
@@ -110,7 +134,8 @@ export class EthcontractService {
       that.web3.eth.getCoinbase(function (err, account) {
         if (err === null) {
 
-          that.contracts.registerUser(formdata.EthAddress, formdata.Name, formdata.Location, formdata.Role, {
+          // that.contracts_SupplyChain.registerUser(formdata.EthAddress, formdata.Name, formdata.Location, formdata.Role, {
+          that.contracts_SupplyChain.registerUser(formdata.EthAddress, formdata.Name, formdata.Location, formdata.Role, {
             from: account
           }, function (error, result) {
             if (!error)
@@ -131,7 +156,8 @@ export class EthcontractService {
         if (err === null) {
           that.web3.eth.getBalance(account, function (err, balance) {
             if (err === null) {
-              that.contracts.getUserInfo(
+              // that.contracts_SupplyChain.getUserInfo(
+              that.contracts_SupplyChain.getUserInfo(
                 account,
                 {
                   from: account
@@ -164,7 +190,8 @@ export class EthcontractService {
   getUserCount = () => {
     let that = this;
     return new Promise((resolve, reject) => {
-      that.contracts.getUsersCount(function (error, userCount) {
+      // that.contracts_SupplyChain.getUsersCount(function (error, userCount) {
+      that.contracts_SupplyChain.getUsersCount(function (error, userCount) {
         if (!error) {
           return resolve({ UserCount: JSON.parse(userCount) });
         }
@@ -177,7 +204,8 @@ export class EthcontractService {
   getUserProfile = (index: Number) => {
     let that = this;
     return new Promise((resolve, reject) => {
-      that.contracts.getUserbyIndex(index, {
+      // that.contracts_SupplyChain.getUserbyIndex(index, {
+      that.contracts_SupplyChain.getUserbyIndex(index, {
         from: that.coinbase
       }, function (error, uinfo) {
         if (!error) {
@@ -199,7 +227,8 @@ export class EthcontractService {
   getUsers = (account) => {
     let that = this;
     return new Promise((resolve, reject) => {
-      that.contracts.getUserInfo(account,
+      // that.contracts_SupplyChain.getUserInfo(account,
+      that.contracts_SupplyChain.getUserInfo(account,
         function (error, uinfo) {
           if (!error) {
             var jsonres = {
@@ -218,20 +247,28 @@ export class EthcontractService {
   }
   /************************************************* Supplier *************************************/
 
-  supplyRaw = (formdata) => {
+  createRawPackage = (formdata) => {
     let that = this;
-    formdata.Name = that.web3.padRight(that.web3.fromAscii(formdata.Name), 34);
+    formdata.Description = that.web3.padRight(that.web3.fromAscii(formdata.Description), 34);
+    formdata.FarmerName = that.web3.padRight(that.web3.fromAscii(formdata.FarmerName), 34);
     formdata.Location = that.web3.padRight(that.web3.fromAscii(formdata.Location), 34);
 
     return new Promise((resolve, reject) => {
-      that.contracts.registerUser(formdata.EthAddress, formdata.Name, formdata.Location, formdata.Role, {
-        from: that.coinbase
-      }, function (error, result) {
-        if (!error)
-          resolve(result)
+      that.web3.eth.getCoinbase(function (err, account) {
+        if (err === null) {
+          // that.contracts_SupplyChain.supplyRaw(formdata.Description, formdata.FarmerName, formdata.Location, formdata.Quantity, formdata.Shipper, formdata.Receiver, {
+          that.contracts_SupplyChain.createRawPackage(formdata.Description, formdata.FarmerName, formdata.Location, formdata.Quantity, formdata.Shipper, formdata.Receiver, {
+            from: account
+          }, function (error, result) {
+            if (!error)
+              resolve(result)
+            else
+              reject(error);
+          })
+        }
         else
-          reject(error);
-      })
+          reject(err);
+      });
     });
   }
 
@@ -241,7 +278,8 @@ export class EthcontractService {
       that.web3.eth.getCoinbase(function (err, account) {
         if (err === null) {
 
-          that.contracts.getCountOfProducts({
+          // that.contracts_SupplyChain.getCountOfProducts({
+          that.contracts_SupplyChain.getPackagesCountS({
             from: account
           }, function (error, result) {
             if (!error)
@@ -259,7 +297,8 @@ export class EthcontractService {
     return new Promise((resolve, reject) => {
       that.web3.eth.getCoinbase(function (err, account) {
         if (err === null) {
-          that.contracts.getProductIdByIndex(index, {
+          // that.contracts_SupplyChain.getProductIdByIndex(index, {
+          that.contracts_SupplyChain.getPackageIdByIndexS(index, {
             from: account
           }, function (error, result) {
             // console.log(result);
@@ -278,20 +317,31 @@ export class EthcontractService {
     return new Promise((resolve, reject) => {
       that.web3.eth.getCoinbase(function (err, account) {
         if (err === null) {
-          that.contracts.getSupplyRaw(batchid, {
+          let contracts_RawMatrials = that.web3.eth.contract(
+            contract_RawMatrials.abi
+          ).at(batchid);
+          contracts_RawMatrials.getSuppliedRawMatrials({
             from: account
           }, function (error, result) {
             if (!error) {
-              let jsonres = {
-                "Description": that.web3.toAscii(result[0].replace(/0+\b/, "")),
-                "FarmerName": that.web3.toAscii(result[1].replace(/0+\b/, "")),
-                "FarmLocation": that.web3.toAscii(result[2].replace(/0+\b/, "")),
-                "Quantity": JSON.parse(result[3]),
-                "Shipper": result[4],
-                "Receiver": result[5],
-                "Supplier": result[6]
-              }
-              resolve(jsonres);
+              contracts_RawMatrials.getRawMatrialsStatus(function (error, status) {
+                if (!error) {
+                  let jsonres = {
+                    "Description": that.web3.toAscii(result[0].replace(/0+\b/, "")),
+                    "FarmerName": that.web3.toAscii(result[1].replace(/0+\b/, "")),
+                    "FarmLocation": that.web3.toAscii(result[2].replace(/0+\b/, "")),
+                    "Quantity": JSON.parse(result[3]),
+                    "Shipper": result[4],
+                    "Receiver": result[5],
+                    "Supplier": result[6],
+                    "Status": JSON.parse(status)
+                  }
+                  resolve(jsonres);
+                } else {
+                  return reject(error);
+                }
+              });
+
             }
             else
               reject(error);
@@ -304,11 +354,149 @@ export class EthcontractService {
   getRawMatrialStatus = (batchid) => {
     let that = this;
     return new Promise((resolve, reject) => {
-      that.contracts.getStatusOfRawMatrials(batchid, function (error, result) {
+      let contracts_RawMatrials = that.web3.eth.contract(
+        contract_RawMatrials.abi
+      ).at(batchid);
+      contracts_RawMatrials.getRawMatrialsStatus(function (error, result) {
         if (!error) {
           return resolve({ "Status": JSON.parse(result) });
         } else {
           return reject(error);
+        }
+      });
+    });
+  }
+
+  getPackagesCountM = () => {
+    let that = this;
+    return new Promise((resolve, reject) => {
+      that.web3.eth.getCoinbase(function (err, account) {
+        if (err === null) {
+
+          // that.contracts_SupplyChain.getCountOfProducts({
+          that.contracts_SupplyChain.getPackagesCountM({
+            from: account
+          }, function (error, result) {
+            if (!error)
+              resolve(JSON.parse(result));
+            else
+              reject(error);
+          })
+        }
+      });
+    });
+  }
+  getBatchesCountM = () => {
+    let that = this;
+    return new Promise((resolve, reject) => {
+      that.web3.eth.getCoinbase(function (err, account) {
+        if (err === null) {
+
+          // that.contracts_SupplyChain.getCountOfProducts({
+          that.contracts_SupplyChain.getBatchesCountM({
+            from: account
+          }, function (error, result) {
+            if (!error)
+              resolve(JSON.parse(result));
+            else
+              reject(error);
+          })
+        }
+      });
+    });
+  }
+  transportCount = () => {
+    let that = this;
+    return new Promise((resolve, reject) => {
+      that.web3.eth.getCoinbase(function (err, account) {
+        if (err === null) {
+
+          // that.contracts_SupplyChain.getCountOfProducts({
+          that.contracts_SupplyChain.transportCount({
+            from: account
+          }, function (error, result) {
+            if (!error)
+              resolve(JSON.parse(result));
+            else
+              reject(error);
+          })
+        }
+      });
+    });
+  }
+
+  getTransportBatchIdByIndex = (index) => {
+    let that = this;
+    console.log(index)
+    return new Promise((resolve, reject) => {
+      that.web3.eth.getCoinbase(function (err, account) {
+        if (err === null) {
+          that.contracts_SupplyChain.getTransportBatchIdByIndex(index, {
+            from: account
+          }, function (err, result) {
+            console.log(err, result)
+
+            if (!err) {
+              return resolve({ "consignmentID": result[0], "tarnsType": JSON.parse(result[1]) });
+            } else {
+              return reject(err);
+            }
+          });
+        }
+      });
+    });
+  }
+  /************************************************* Transporter *************************************/
+  loadConsingment = (formdata) => {
+    let that = this;
+    return new Promise((resolve, reject) => {
+      that.web3.eth.getCoinbase(function (err, account) {
+        if (err === null) {
+          that.contracts_SupplyChain.loadConsingment(formdata.pid, formdata.transportertype, formdata.cid, {
+            from: account
+          }, function (error, result) {
+            if (!error)
+              resolve(result)
+            else
+              reject(error);
+          });
+        }
+      });
+    });
+  }
+  /************************************************* Manufecturer *************************************/
+  rawPackageReceived = (formdata) => {
+    let that = this;
+    return new Promise((resolve, reject) => {
+      that.web3.eth.getCoinbase(function (err, account) {
+        if (err === null) {
+          that.contracts_SupplyChain.rawPackageReceived(formdata.pid, {
+            from: account
+          }, function (error, result) {
+            if (!error)
+              resolve(result)
+            else
+              reject(error);
+          });
+        }
+      });
+    });
+  }
+  getPackageBatchIDM = (index) => {
+    let that = this;
+    return new Promise((resolve, reject) => {
+      that.web3.eth.getCoinbase(function (err, account) {
+        if (err === null) {
+          // that.contracts_SupplyChain.getProductIdByIndex(index, {
+          that.contracts_SupplyChain.getPackageIDByIndexM(index, {
+            from: account
+          }, function (error, result) {
+            // console.log(result);
+            if (!error)
+              resolve(result);
+            else
+              reject(error);
+          })
         }
       });
     });

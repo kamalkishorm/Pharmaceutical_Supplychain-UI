@@ -10,11 +10,11 @@ import * as $ from 'jquery';
 import Swal from 'sweetalert2'
 
 @Component({
-  selector: 'app-user-supplier',
-  templateUrl: './supplier.component.html',
-  styleUrls: ['./supplier.component.css']
+  selector: 'app-user-transporter',
+  templateUrl: './transporter.component.html',
+  styleUrls: ['./transporter.component.css']
 })
-export class SupplierComponent implements OnInit {
+export class TransporterComponent implements OnInit {
 
   account = "0x0";
   balance = '0 ETH';
@@ -40,13 +40,15 @@ export class SupplierComponent implements OnInit {
   }
   package_list = [];
   displayedColumns: string[] = [
+    'txtype',
     'batchid',
-    'description',
-    'farmername',
+    // 'description',
+    // 'farmername',
     'location',
     'quantity',
-    'shipper',
-    'receiver',
+    // 'shipper',
+    'from',
+    'to',
     'status',
     'star'
   ];
@@ -74,7 +76,7 @@ export class SupplierComponent implements OnInit {
     private ethcontractService: EthcontractService,
     private fb: FormBuilder
   ) {
-    localStorage.setItem('packageidpointer', 0 + '');
+    localStorage.setItem('shipperpackageidpointer', 0 + '');
     this.initAndDisplayAccount();
   }
 
@@ -82,7 +84,7 @@ export class SupplierComponent implements OnInit {
 
   initAndDisplayAccount = () => {
     let that = this;
-    this.ethcontractService.getRole().then(function(acctInfo: any) {
+    this.ethcontractService.getRole().then(function (acctInfo: any) {
       console.log(acctInfo)
 
       that.account = acctInfo.Account;
@@ -91,23 +93,23 @@ export class SupplierComponent implements OnInit {
       that.location = acctInfo.Role.Location;
       that.role = that.Roles[acctInfo.Role.Role];
 
-      if (acctInfo.Role.Role != 1) {
-        window.alert("User is not Supplier.")
+      if (acctInfo.Role.Role != 2) {
+        window.alert("User is not Transporter.")
         that.router.navigate(['/']);
       } else {
-        that.getPackageCount();
+        that.transportCount();
       }
 
-    }).catch(function(error) {
+    }).catch(function (error) {
       console.log(error);
       that.router.navigate(['/']);
 
     });
   }
 
-  getPackageCount = async () => {
+  transportCount = async () => {
     let that = this;
-    await this.ethcontractService.getPackageCount().then(function(packageCount: any) {
+    await this.ethcontractService.transportCount().then(function (packageCount: any) {
       console.log(packageCount);
       that.packageCount = packageCount;
     })
@@ -119,45 +121,54 @@ export class SupplierComponent implements OnInit {
     console.log(that.packageCount)
     // that.package_list = [];
     let itrate = true;
-    let from = Number(localStorage.getItem('packageidpointer'));
+    let from = Number(localStorage.getItem('shipperpackageidpointer'));
     let to: Number;
     if (that.packageCount < from + 5) {
       to = that.packageCount;
-      localStorage.setItem('packageidpointer', to + '');
+      localStorage.setItem('shipperpackageidpointer', to + '');
       itrate = false;
     } else if (that.packageCount > from + 5) {
       to = from + 5;
-      localStorage.setItem('packageidpointer', to + '');
+      localStorage.setItem('shipperpackageidpointer', to + '');
     }
+    console.log(from, to)
     let i: number;
-    console.log(from,to)
     for (i = from; i < to; i++) {
-      await this.ethcontractService.getPackageBatchID(i).then(async function(batchid: any) {
-        if (batchid) {
-          console.log(batchid);
-          await that.ethcontractService.getPackageBatchIDDetails(batchid).then(function(packageinforesult: any) {
-            if (packageinforesult) {
-              console.log(packageinforesult);
-              let jsonres = {
-                "BatchID": batchid,
-                "Description": packageinforesult.Description,
-                "FarmerName": packageinforesult.FarmerName,
-                "FarmLocation": packageinforesult.FarmLocation,
-                "Quantity": packageinforesult.Quantity,
-                "Shipper": packageinforesult.Shipper,
-                "Receiver": packageinforesult.Receiver,
-                "Supplier": packageinforesult.Supplier,
-                "Status": that.packageStatus[packageinforesult.Status]
-              }
-              that.package_list.push(jsonres);
-            }
-          });
+      await this.ethcontractService.getTransportBatchIdByIndex(i).then(async function (transportationReq: any) {
+        if (transportationReq) {
+          console.log(transportationReq);
+          switch (transportationReq.tarnsType) {
+            case 0:
+              await that.ethcontractService.getPackageBatchIDDetails(transportationReq.consignmentID).then(function (packageinforesult: any) {
+                if (packageinforesult) {
+                  console.log(packageinforesult);
+                  let jsonres = {
+                    "TxType": 0,
+                    "BatchID": transportationReq.consignmentID,
+                    "Description": packageinforesult.Description,
+                    "FarmerName": packageinforesult.FarmerName,
+                    "FarmLocation": packageinforesult.FarmLocation,
+                    "Quantity": packageinforesult.Quantity,
+                    "Shipper": packageinforesult.Shipper,
+                    "Receiver": packageinforesult.Receiver,
+                    "Supplier": packageinforesult.Supplier,
+                    "Status": that.packageStatus[packageinforesult.Status]
+                  }
+                  that.package_list.push(jsonres);
+                }
+              }).catch(function (error) {
+                console.log(error);
+              });
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+          }
         }
-      }).catch(function(error) {
+      }).catch(function (error) {
         console.log(error);
       });
     }
-
     console.log(that.package_list);
     this.dataSource = new MatTableDataSource<RawMaterial>(that.package_list);
     this.dataSource.paginator = this.paginator;
@@ -170,15 +181,16 @@ export class SupplierComponent implements OnInit {
   getPackageTx = (selectedBatchID) => {
     let that = this;
     console.log(selectedBatchID);
-    that.packageInfo.Status = -1;
-    this.ethcontractService.getRawMatrialStatus(selectedBatchID.BatchID).then(function(response: any) {
+    // that.packageInfo['Status'] = -1;
+    that.packageInfo['TxType'] = 1;
+    this.ethcontractService.getRawMatrialStatus(selectedBatchID.BatchID).then(function (response: any) {
       if (response) {
         that.packageInfo['Batch'] = selectedBatchID;
-        that.ethcontractService.getUsers(selectedBatchID.Shipper).then(function(shipperInfo: any) {
+        that.ethcontractService.getUsers(selectedBatchID.Shipper).then(function (shipperInfo: any) {
           if (shipperInfo) {
             console.log(shipperInfo);
             that.packageInfo['Shipper'] = shipperInfo.result;
-            that.ethcontractService.getUsers(selectedBatchID.Receiver).then(function(manufacturerInfo: any) {
+            that.ethcontractService.getUsers(selectedBatchID.Receiver).then(function (manufacturerInfo: any) {
               if (manufacturerInfo) {
                 console.log(manufacturerInfo);
                 that.packageInfo['Manufacturer'] = manufacturerInfo.result;
@@ -216,33 +228,31 @@ export class SupplierComponent implements OnInit {
         });
 
       }
-    }).catch(function(error) {
+    }).catch(function (error) {
       console.log(error);
     });
 
   }
 
-  createPackage = () => {
+  pickPackage = (pid, txtype, cid) => {
     console.log(this.packageDetails.value);
     let that = this;
     var formdata = {
-      Description: this.packageDetails.value.description,
-      FarmerName: this.packageDetails.value.farmername,
-      Location: this.packageDetails.value.location.latitude + "_" + this.packageDetails.value.location.longitude,
-      Quantity: this.packageDetails.value.quantity,
-      Shipper: this.packageDetails.value.shipper,
-      Receiver: this.packageDetails.value.receiver
+      pid: pid,
+      transportertype: txtype,
+      cid: cid
     }
-
-    this.ethcontractService.createRawPackage(formdata).then(function(txhash: any) {
+console.log(formdata)
+    this.ethcontractService.loadConsingment(formdata).then(function (txhash: any) {
       if (txhash) {
         console.log(txhash);
         that.handleTransactionResponse(txhash);
       }
-    }).catch(function(error) {
+    }).catch(function (error) {
       console.log(error);
     });
   }
+ 
 
   handleTransactionResponse = (txHash) => {
     var txLink = "https://ropsten.etherscan.io/tx/" + txHash;
@@ -252,7 +262,7 @@ export class SupplierComponent implements OnInit {
     $("#linkOngoingTransaction").html(txLinkHref);
     $("#divOngoingTransaction").fadeIn();
     /*scroll to top*/
-    $('html, body').animate({ scrollTop: 0 }, 'slow', function() { });
+    $('html, body').animate({ scrollTop: 0 }, 'slow', function () { });
   }
 
 }
