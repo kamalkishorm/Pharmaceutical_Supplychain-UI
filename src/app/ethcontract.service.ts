@@ -485,6 +485,24 @@ export class EthcontractService {
     });
   }
 
+  getRawPackageQunatity = (formdata) => {
+    let that = this;
+    return new Promise((resolve, reject) => {
+      that.web3.eth.getCoinbase(function (err, account) {
+        if (err === null) {
+          that.contracts_SupplyChain.getRawPackageQunatity(formdata.PackageID, {
+            from: account
+          }, function (error, result) {
+            // console.log(result);
+            if (!error)
+              resolve(result);
+            else
+              reject(error);
+          })
+        }
+      });
+    });
+  }
   useRawPackage = (formdata) => {
     let that = this;
     return new Promise((resolve, reject) => {
