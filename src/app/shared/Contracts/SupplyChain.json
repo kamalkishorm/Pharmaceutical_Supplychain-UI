@@ -42719,15 +42719,15 @@
     "version": "0.5.1+commit.c8a2cb62.Emscripten.clang"
   },
   "networks": {
-    "3": {
+    "15": {
       "events": {},
       "links": {},
-      "address": "0xAB90214a9ADD4F3024F80e4Da7F37F499FD6A44C",
-      "transactionHash": "0x68cc1a9f7f4de1392e9855986e23879d15ccb99ea33e075c18f9f151381d3a4b"
+      "address": "0x335CA822745Af03a82d82CD817742032c3903C79",
+      "transactionHash": "0x0449fa113e95184c8759a4bc748e9af4616fb4747ffe24ac4c0d6e8b9709d89b"
     }
   },
   "schemaVersion": "3.0.0",
-  "updatedAt": "2019-03-08T08:23:59.531Z",
+  "updatedAt": "2019-03-08T10:18:21.213Z",
   "devdoc": {
     "author": "Kamal Kishor Mehra",
     "methods": {
