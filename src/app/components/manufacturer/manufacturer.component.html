@@ -393,7 +393,7 @@
                             <button (click)="addRawMat()">Add Raw Material</button>
 
                             <div *ngFor="let address of rawmaterial.controls; let i=index">
-                                <div formGroupName="i">
+                                <div [formGroupName]="i">
                                     <h3>Raw Material</h3>
                                     <label>
                                         Package-ID:
