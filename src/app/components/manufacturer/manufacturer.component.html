@@ -390,18 +390,16 @@
                         </div>
                         <div formArrayName="rawmaterial">
                             <h3>Raw Materials</h3>
-                            <button (click)="addRawMat()">Add Raw Material</button>
+                            <button (click)="addRawMat()" class="btn btn-primary">Add Raw Material</button>
 
                             <div *ngFor="let address of rawmaterial.controls; let i=index">
-                                <div formGroupName="i">
-                                    <h3>Raw Material</h3>
+                                <div [formGroupName]="i">
                                     <label>
-                                        Package-ID:
-                                        <input type="text" [formControlName]="pid">
+                                        <input type="text" formControlName="pid" class="form-control">
                                     </label>
                                     <label>
                                         Quantity:
-                                        <input type="text" [formControlName]="quantity">
+                                        <input type="text" formControlName="quantity" class="form-control">
                                     </label>
                                 </div>
                             </div>
@@ -420,7 +418,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="createBatch()"
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="createMedicine()"
                         [disabled]="!medicineDetails.valid">Save Changes</button>
                 </div>
             </div>

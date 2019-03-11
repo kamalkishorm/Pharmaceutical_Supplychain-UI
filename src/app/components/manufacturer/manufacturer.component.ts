@@ -17,12 +17,14 @@ import Swal from 'sweetalert2'
 })
 export class ManufacturerComponent implements OnInit {
 
+  // quantity: any[]=[];
   account = "0x0";
   balance = '0 ETH';
   amount = 0;
   name: any;
   location: any;
   role: any;
+  rawRemain:{};
   rawPackageCount: 0;
   batchCount: 0;
   Roles = {
@@ -90,10 +92,10 @@ export class ManufacturerComponent implements OnInit {
     rawmaterial: this.fb.array([
       this.fb.group({
         pid:[''],
-        quantity:[0]
+        quantity: [0]
       })
     ])
-  });;
+  });
   MedicineSource: MatTableDataSource<Medicine>;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -161,7 +163,7 @@ export class ManufacturerComponent implements OnInit {
     var formdata = {
       PackageID: this.rawreceivepid.value.pid
     }
-    console.log(formdata);
+    console.log("data received "+formdata);
 
     this.ethcontractService.rawPackageReceived(formdata).then(function (txhash: any) {
       if (txhash) {
@@ -202,14 +204,21 @@ export class ManufacturerComponent implements OnInit {
                 "FarmerName": packageinfo.FarmerName,
                 "FarmLocation": packageinfo.FarmLocation,
                 "InitQuantity": packageinfo.Quantity,
-                "UsedQuantity": batchid[1],
+                "UsedQuantity": JSON.parse(batchid[1]),
                 "Shipper": packageinfo.Shipper,
                 "Receiver": packageinfo.Receiver,
                 "Supplier": packageinfo.Supplier,
                 "Status": that.packageStatus[packageinfo.Status]
               }
+              var reamin = (Number(packageinfo.Quantity) - Number(JSON.parse(batchid[1]))); 
+              var bid = batchid[0];
+              console.log(bid,reamin)
+              that.rawRemain[batchid[0].toString()] = reamin;
+              // Object.assign(that.rawRemain,{thisbid : reamin});
+              console.log(that.rawRemain);
               that.package_list.push(jsonres);
             }
+            console.log("initial quantity"+packageinfo.Quantity)
           });
         }
       }).catch(function (error) {
@@ -281,7 +290,10 @@ export class ManufacturerComponent implements OnInit {
 
   }
 
-  createBatch = () => {
+  createMedicine = () => {
+
+    // console.log("initial quantity"+this.)
+
     console.log(this.medicineDetails.value);
     let that = this;
     var formdata = {
@@ -290,9 +302,18 @@ export class ManufacturerComponent implements OnInit {
       Quantity: this.medicineDetails.value.quantity,
       Shipper: this.medicineDetails.value.shipper,
       Receiver: this.medicineDetails.value.receiver,
+      RawMaterialNew: this.medicineDetails.value.rawmaterial, 
       RawDes: "Done"
     }
-console.log(formdata)
+    console.log("rawmaterial "+ this.rawmaterial);
+    // console.log(" jsonres quantity" + this.quantity);
+
+    for (var i=0; i<2; i++){
+      formdata.RawMaterialNew <= ''
+    }
+
+
+console.log("Data" +formdata)
     // this.ethcontractService.createRawPackage(formdata).then(function (txhash: any) {
     //   if (txhash) {
     //     console.log(txhash);
@@ -306,9 +327,10 @@ console.log(formdata)
     return this.medicineDetails.get('rawmaterial') as FormArray;
   }
   addRawMat = () => {
-      this.rawmaterial.push(this.fb.group({
+      this.rawmaterial.push(
+        this.fb.group({
           pid:[''],
-          count:[0]
+          quantity:[0]
         }));
   }
   getBatchesInfo = () => {
